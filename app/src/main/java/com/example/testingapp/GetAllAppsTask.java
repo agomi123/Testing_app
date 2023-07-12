@@ -29,17 +29,17 @@ public class GetAllAppsTask extends AsyncTask<Void, Void, List<ApplicationInfo>>
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         @SuppressLint("QueryPermissionsNeeded")
         List<ApplicationInfo> apps = packageManager.getInstalledApplications(0);
-        List<ApplicationInfo>apk = new ArrayList<>();
-        for(ApplicationInfo app : apps) {
-            if((app.flags & ( ApplicationInfo.FLAG_INSTALLED)) > 0) {
-                // It is a system app
-                apk.add(app);
-            } else {
-
-                // It is installed by the user
-            }
-        }
-        return apk;
+//        for (ApplicationInfo app : apps) {
+//            if ((app.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
+//                // Exclude system apps
+//                String installerPackageName = packageManager.getInstallerPackageName(app.packageName);
+//                if ("com.android.vending".equals(installerPackageName)) {
+//                    // It is installed from the Google Play Store
+////                    apk.add(app);
+//                }
+//            }
+//        }
+        return apps;
     }
     private List<ApplicationInfo> checkForLaunchIntent(List<ApplicationInfo> list) {
         ArrayList<ApplicationInfo> applist = new ArrayList<>();
