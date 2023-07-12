@@ -1,6 +1,10 @@
 package com.example.testingapp;
 
+import static android.Manifest.permission.PACKAGE_USAGE_STATS;
+import static android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION;
+
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
@@ -37,10 +41,11 @@ public class OnBoardingScreen2 extends AppCompatActivity {
     Animation animation;
     int currentPos;
     public final static int REQUEST_NOTIFICATION_ACCESS = 1234;
-    private static final int REQUEST_CODE_DEVICE_ADMIN = 1;
-    boolean isNotificationServiceRunning;
+    private static final int REQUEST_CODE_DEVICE_ADMIN = 1003;
     private static final int REQUEST_LOCATION_PERMISSION = 1001;
     private static final int IGNORE_BATTERY_OPTIMIZATION_REQUEST = 1002;
+    private static final int REQUEST_APP_SUPERVISION = 1004;
+    private static final int REQUEST_OVERLAY_APP = 1005;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,27 +146,15 @@ public class OnBoardingScreen2 extends AppCompatActivity {
     private void requestOverlayPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!Settings.canDrawOverlays(this)) {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + this.getPackageName()));
+                Intent intent = new Intent(ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + this.getPackageName()));
+//                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
 
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_OVERLAY_APP);
             } else {
-//                switchOverlayPermission.setChecked(true);
+                Toast.makeText(this, "Permission Already Given", Toast.LENGTH_LONG).show();
             }
         }
     }
-
-//    private void requestWriteSettingsPermission() {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//            if (!Settings.System.canWrite(this)) {
-//                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-////                startActivityForResult(intent, Constant.WRITE_SETTINGS_PERMISSION_REQUEST_CODE);
-//                startActivity(intent);
-//            } else {
-//                Toast.makeText(this, "Permission Already Given", Toast.LENGTH_SHORT).show();
-//            }
-//        }
-//    }
-
     private boolean isNotificationServiceRunning() {
         ContentResolver contentResolver = getContentResolver();
         String enabledNotificationListeners =
@@ -170,14 +163,14 @@ public class OnBoardingScreen2 extends AppCompatActivity {
         return enabledNotificationListeners != null && enabledNotificationListeners.contains(packageName);
     }
     private void requestPackageUsagePermission() {
-        if (ContextCompat.checkSelfPermission(OnBoardingScreen2.this, Manifest.permission.PACKAGE_USAGE_STATS) != PackageManager.PERMISSION_GRANTED) {
-            Intent intent = null;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
-                startActivity(intent);
+        if (ContextCompat.checkSelfPermission(OnBoardingScreen2.this, PACKAGE_USAGE_STATS) != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                startActivityForResult(intent, REQUEST_APP_SUPERVISION);
             }
 
         }
+        else Toast.makeText(this, "Permission Already Given", Toast.LENGTH_LONG).show();
     }
     private void requestDeviceAdminPermission() {
         DevicePolicyManager devicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
@@ -188,14 +181,14 @@ public class OnBoardingScreen2 extends AppCompatActivity {
             intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Device admin permission is required for...");
             startActivityForResult(intent, REQUEST_CODE_DEVICE_ADMIN);
         }
+        else Toast.makeText(this, "Already Given the Permission", Toast.LENGTH_SHORT).show();
     }
     private void requestLocationPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // Permission is not granted, request it
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
         } else {
-            // Permission is already granted
-            // You can proceed with location-related operations here
+            Toast.makeText(this, "Permission Already Given", Toast.LENGTH_LONG).show();
         }
     }
     private void requestIgnoreBatteryOptimization() {
