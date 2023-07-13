@@ -26,21 +26,18 @@ public class GetAllAppsTask extends AsyncTask<Void, Void, List<ApplicationInfo>>
         Intent intent = new Intent(Intent.ACTION_MAIN, null);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         @SuppressLint("QueryPermissionsNeeded")
-//        List<ApplicationInfo> apps = packageManager.getInstalledApplications(0);
-//        apps= checkForLaunchIntent(apps);
+        List<ApplicationInfo>app=new ArrayList<>();
         int flags = PackageManager.GET_META_DATA |
                 PackageManager.GET_SHARED_LIBRARY_FILES |
                 PackageManager.GET_UNINSTALLED_PACKAGES;
 
 //        PackageManager pm = getPackageManager();
         List<ApplicationInfo> applications = packageManager.getInstalledApplications(flags);
-        List<ApplicationInfo>app=new ArrayList<>();
         for (ApplicationInfo appInfo : applications) {
             if ((appInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 1) {
                 // System application
-                app.add(appInfo);
-
             } else {
+                app.add(appInfo);
                 // Installed by user
             }
         }
