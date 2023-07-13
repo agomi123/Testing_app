@@ -23,23 +23,28 @@ public class GetAllAppsTask extends AsyncTask<Void, Void, List<ApplicationInfo>>
 
     @Override
     protected List<ApplicationInfo> doInBackground(Void... params) {
-        //getPackageManager().getInstalledApplications(PackageManager.GET_META_DATA);
-//        final PackageManager packageManager = getPackageManager();
         Intent intent = new Intent(Intent.ACTION_MAIN, null);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         @SuppressLint("QueryPermissionsNeeded")
-        List<ApplicationInfo> apps = packageManager.getInstalledApplications(0);
-//        for (ApplicationInfo app : apps) {
-//            if ((app.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
-//                // Exclude system apps
-//                String installerPackageName = packageManager.getInstallerPackageName(app.packageName);
-//                if ("com.android.vending".equals(installerPackageName)) {
-//                    // It is installed from the Google Play Store
-////                    apk.add(app);
-//                }
-//            }
-//        }
-        return apps;
+//        List<ApplicationInfo> apps = packageManager.getInstalledApplications(0);
+//        apps= checkForLaunchIntent(apps);
+        int flags = PackageManager.GET_META_DATA |
+                PackageManager.GET_SHARED_LIBRARY_FILES |
+                PackageManager.GET_UNINSTALLED_PACKAGES;
+
+//        PackageManager pm = getPackageManager();
+        List<ApplicationInfo> applications = packageManager.getInstalledApplications(flags);
+        List<ApplicationInfo>app=new ArrayList<>();
+        for (ApplicationInfo appInfo : applications) {
+            if ((appInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 1) {
+                // System application
+                app.add(appInfo);
+
+            } else {
+                // Installed by user
+            }
+        }
+        return app;
     }
     private List<ApplicationInfo> checkForLaunchIntent(List<ApplicationInfo> list) {
         ArrayList<ApplicationInfo> applist = new ArrayList<>();
